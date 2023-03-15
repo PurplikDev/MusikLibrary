@@ -45,6 +45,11 @@ void printOptions() {
     std::cout << " - Remove data from memory" << std::endl;
 
     SetConsoleTextAttribute(col, 6);
+    std::cout << "LIST";
+    SetConsoleTextAttribute(col, 8);
+    std::cout << " - List all interprets, their albums and songs in them" << std::endl;
+
+    SetConsoleTextAttribute(col, 6);
     std::cout << "SAVE";
     SetConsoleTextAttribute(col, 8);
     std::cout << " - Save data into a file" << std::endl;
@@ -134,6 +139,29 @@ void AddInterpret() {
     interprets.push_back(getInterpret());
 }
 
+void ListSongs(std::list<Song> songs) {
+    for (auto song : songs)
+    {
+        std::cout << "   - " << song.songName << std::endl;
+    }
+}
+
+void ListAlbums(std::list<Album> albums) {
+    for (auto album : albums)
+    {
+        std::cout << " - " << album.albumName << std::endl;
+        ListSongs(album.songs);
+    }
+}
+
+void ListInterprets(std::list<Interpret> interprets) {
+    for (auto interpret : interprets)
+    {
+        std::cout << interpret.interpretName << std::endl;
+        ListAlbums(interpret.albums);
+    }
+}
+
 int main() {
     col =  GetStdHandle(STD_OUTPUT_HANDLE);
     bool working = true;
@@ -142,12 +170,24 @@ int main() {
 
     while(working) {
         printOptions();
-        std::string menuInput = checkInputs();
+        std::string menuInput = "";
+        menuInput = checkInputs();
 
         separate();
 
         if(menuInput == "ADD" || menuInput == "add") {
             AddInterpret();
+        }
+
+        if(menuInput == "LIST" || menuInput == "list") {
+            if(interprets.size() > 0) {
+                ListInterprets(interprets);
+            } else {
+                SetConsoleTextAttribute(col, 12);
+                std::cout << "List is empty, add interprets first!" << std::endl;
+                SetConsoleTextAttribute(col, 7);
+            }
+
         }
 
         if(menuInput == "END" || menuInput == "end") {
