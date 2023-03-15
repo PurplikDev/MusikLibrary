@@ -166,7 +166,7 @@ void ListInterprets(std::list<Interpret> interprets) {
 void SaveToFile() {
     std::string filename;
     std::cin >> filename;
-    filename = filename + ".html";
+    filename = filename + ".m3u";
 
     std::ofstream fileToBeSaved(filename, std::ios::out);
     fileToBeSaved.close();
