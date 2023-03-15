@@ -39,11 +39,12 @@ void printOptions() {
     SetConsoleTextAttribute(col, 8);
     std::cout << " - Add an interpret" << std::endl;
 
+    /*
     SetConsoleTextAttribute(col, 6);
     std::cout << "REMOVE";
     SetConsoleTextAttribute(col, 8);
     std::cout << " - Remove data from memory" << std::endl;
-
+    */
     SetConsoleTextAttribute(col, 6);
     std::cout << "LIST";
     SetConsoleTextAttribute(col, 8);
@@ -162,6 +163,15 @@ void ListInterprets(std::list<Interpret> interprets) {
     }
 }
 
+void SaveToFile() {
+    std::string filename;
+    std::cin >> filename;
+    filename = filename + ".html";
+
+    std::ofstream fileToBeSaved(filename, std::ios::out);
+    fileToBeSaved.close();
+}
+
 int main() {
     col =  GetStdHandle(STD_OUTPUT_HANDLE);
     bool working = true;
@@ -188,6 +198,10 @@ int main() {
                 SetConsoleTextAttribute(col, 7);
             }
 
+        }
+
+        if(menuInput == "SAVE" || menuInput == "save") {
+            SaveToFile();
         }
 
         if(menuInput == "END" || menuInput == "end") {
