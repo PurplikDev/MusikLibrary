@@ -51,6 +51,21 @@ void printOptions() {
     std::cout << " - List all interprets, their albums and songs in them" << std::endl;
 
     SetConsoleTextAttribute(col, 6);
+    std::cout << "ADDPLAYLIST";
+    SetConsoleTextAttribute(col, 8);
+    std::cout << " - Add a song to a playlist" << std::endl;
+
+    SetConsoleTextAttribute(col, 6);
+    std::cout << "PLAYLIST";
+    SetConsoleTextAttribute(col, 8);
+    std::cout << " - Display all songs in the current playlist" << std::endl;
+
+    SetConsoleTextAttribute(col, 6);
+    std::cout << "NEWPLAYLIST";
+    SetConsoleTextAttribute(col, 8);
+    std::cout << " - Clear current and make new playlist" << std::endl;
+
+    SetConsoleTextAttribute(col, 6);
     std::cout << "SAVE";
     SetConsoleTextAttribute(col, 8);
     std::cout << " - Save data into a file" << std::endl;
@@ -60,6 +75,16 @@ void printOptions() {
     SetConsoleTextAttribute(col, 8);
     std::cout << " - Load data from a file" << std::endl;
 
+    SetConsoleTextAttribute(col, 6);
+    std::cout << "SAVEINTERPRETS";
+    SetConsoleTextAttribute(col, 8);
+    std::cout << " - Save interpret data into a file" << std::endl;
+
+    SetConsoleTextAttribute(col, 6);
+    std::cout << "LOADINTERPRETS";
+    SetConsoleTextAttribute(col, 8);
+    std::cout << " - Load interpret data from a file" << std::endl;
+
     SetConsoleTextAttribute(col, 12);
     std::cout << "END";
     SetConsoleTextAttribute(col, 8);
@@ -67,7 +92,6 @@ void printOptions() {
 
     SetConsoleTextAttribute(col, 7);
     separate();
-
 }
 
 std::string checkInputs() {
@@ -86,7 +110,6 @@ struct Song {
 public:
     std::string songName;
 };
-
 
 struct Album {
 public:
@@ -135,6 +158,7 @@ Interpret getInterpret() {
 }
 
 std::list<Interpret> interprets;
+std::list<Song> playlist;
 
 void AddInterpret() {
     interprets.push_back(getInterpret());
@@ -164,11 +188,100 @@ void ListInterprets(std::list<Interpret> interprets) {
 }
 
 void SaveToFile() {
+    int index = 0;
+    char specialSymbol = 92;
     std::string filename;
-    std::cin >> filename;
+
+    std::cout << "Select name for the file" << std::endl;
+    filename = checkInputs();
     filename = filename + ".m3u";
 
     std::ofstream fileToBeSaved(filename, std::ios::out);
+    fileToBeSaved << "#EXTM3U" << std::endl;
+    for (auto song : playlist)
+    {
+        index++;
+        std::cout << index << specialSymbol << song.songName << ".mp3" << std::endl;
+        fileToBeSaved << index << specialSymbol << song.songName << ".mp3" << std::endl;
+    }
+    fileToBeSaved.close();
+}
+
+void LoadFromFile() {
+    std::string filename;
+    std::cout << "What's the name of the file you are trying to load?" << std::endl;
+    filename = checkInputs();
+    filename += ".m3u";
+
+    char specialChar = 92;
+    int index;
+
+    std::string currentLine, modifiedString;
+
+    std::ifstream fileToRead;
+    fileToRead.open(filename);
+    while (getline (fileToRead, currentLine)) {
+
+        if(currentLine != "#EXTM3U") {
+            for (index = 0; index < currentLine.length(); index++) {
+                if (currentLine[index] == specialChar){
+                    break;
+                }
+            }
+            if (index < currentLine.length() - 1) {
+                modifiedString = currentLine.substr(index + 1, currentLine.length() - (index + 1));
+                std::cout << modifiedString.substr(0, modifiedString.find(".", 0)) << std::endl;
+                Song tempSong;
+                tempSong.songName = modifiedString.substr(0, modifiedString.find(".", 0));
+                playlist.push_back(tempSong);
+            }
+        }
+    }
+}
+
+void AddToPlaylist() {
+    playlist.push_back(getSong());
+}
+
+void DisplayPlaylist() {
+    for (auto song : playlist)
+    {
+        std::cout << song.songName  << std::endl;
+    }
+}
+
+void SaveInterpretsToFile() {
+    int index = 0;
+    char specialSymbol = 92;
+    std::string filename;
+
+    std::cout << "Select name for the file" << std::endl;
+    filename = checkInputs();
+    filename = filename + ".txt";
+
+    std::ofstream fileToBeSaved(filename, std::ios::out | std::ios::binary);
+    std::string name="John Doell";
+    int n = name.length();
+
+
+    for (int i = 0; i <= n; i++)
+    {
+        // convert each char to
+        // ASCII value
+        int val = int(name[i]);
+
+        // Convert ASCII value to binary
+        std::string bin = "";
+        while (val > 0)
+        {
+            (val % 2)? bin.push_back('1') :
+            bin.push_back('0');
+            val /= 2;
+        }
+        reverse(bin.begin(), bin.end());
+
+        fileToBeSaved << bin << " ";
+    }
     fileToBeSaved.close();
 }
 
@@ -200,8 +313,32 @@ int main() {
 
         }
 
+        if(menuInput == "ADDPLAYLIST" || menuInput == "addplaylist") {
+            AddToPlaylist();
+        }
+
+        if(menuInput == "PLAYLIST" || menuInput == "playlist") {
+            DisplayPlaylist();
+        }
+
+        if(menuInput == "NEWPLAYLIST" || menuInput == "newplaylist") {
+            playlist.clear();
+        }
+
         if(menuInput == "SAVE" || menuInput == "save") {
             SaveToFile();
+        }
+
+        if(menuInput == "LOAD" || menuInput == "load") {
+            LoadFromFile();
+        }
+
+        if(menuInput == "SAVEINTERPRETS" || menuInput == "saveinterprets") {
+            SaveInterpretsToFile();
+        }
+
+        if(menuInput == "LOADINTERPRETS" || menuInput == "loadinterprets") {
+
         }
 
         if(menuInput == "END" || menuInput == "end") {
